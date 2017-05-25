@@ -49,7 +49,7 @@ static const CGFloat kMinImageScale = 1.0f;
 @property(nonatomic,weak) UIView * blackMask;
 @property(nonatomic,weak) UIButton * doneButton;
 @property(nonatomic,weak) UIButton * crossButton;
-@property(nonatomic, weak) UILabel *captionLbl;
+@property(nonatomic, weak) UILabel *captionLbl, *countLbl;
 @property(nonatomic,weak) UIImageView * senderView;
 @property(nonatomic,assign) NSInteger imageIndex;
 @property(nonatomic,weak) UIImage * defaultImage;
@@ -194,6 +194,17 @@ static const CGFloat kMinImageScale = 1.0f;
     return NO;
 }
 
+
+-(void)viewControlsVisisbility:(BOOL)isHidden{
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(isHidden? 0.0: 0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [_doneButton setHidden:isHidden];
+        [_crossButton setHidden:isHidden];
+        [_countLbl setHidden:isHidden];
+        [_captionLbl setHidden:isHidden];
+    });
+}
+
 #pragma mark - Handle Panning Activity
 - (void) gestureRecognizerDidPan:(UIPanGestureRecognizer*)panGesture {
     if(__scrollView.zoomScale != 1.0f || _isAnimating)return;
@@ -206,6 +217,9 @@ static const CGFloat kMinImageScale = 1.0f;
 //    }
     // Hide the Done Button
     [self hideDoneButton];
+    
+    [self viewControlsVisisbility:true];
+    
     __scrollView.bounces = false;
     CGSize windowSize = _blackMask.bounds.size;
     CGPoint currentPoint = [panGesture translationInView:__scrollView];
@@ -226,6 +240,7 @@ static const CGFloat kMinImageScale = 1.0f;
         if(_blackMask.alpha < 0.85f ||  currentPoint.x < -35 || currentPoint.x > 50) {
             [self dismissViewController];
         }else {
+            [self viewControlsVisisbility:false];
             [self rollbackViewController];
         }
     }
@@ -545,9 +560,9 @@ static const CGFloat kMinImageScale = 1.0f;
 
 #pragma mark - TableView datasource
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
-    return CGSizeMake(self.view.bounds.size.width, collectionView.frame.size.height);
-}
+//- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
+//    return CGSizeMake(self.view.bounds.size.width, collectionView.frame.size.height);
+//}
 
 
 
@@ -592,7 +607,8 @@ static const CGFloat kMinImageScale = 1.0f;
         imageViewerCell.superView = _senderView.superview;
         imageViewerCell.senderView = _senderView;
         imageViewerCell.doneButton = _doneButton;
-       // imageViewerCell.captionLbl = _captionLbl;
+        imageViewerCell.captionLbl = _captionLbl;
+        imageViewerCell.countLbl = _countLbl;
         imageViewerCell.crossButton = _crossButton;
         imageViewerCell.initialIndex = _initialIndex;
         imageViewerCell.statusBarStyle = _statusBarStyle;

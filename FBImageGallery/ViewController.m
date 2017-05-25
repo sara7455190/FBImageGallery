@@ -91,7 +91,7 @@
             // write code when image is opened
             
         } onClose:^{
-            // wirte code when image is closed
+            // write code when image is closed
             
         }];
         
